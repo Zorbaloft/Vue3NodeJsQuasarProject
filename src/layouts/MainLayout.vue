@@ -1,102 +1,127 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="lHh lpR fFf">
+    <q-header elevated class="bg-primary text-white">
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
 
         <q-toolbar-title>
-          Quasar App
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg" />
+          </q-avatar>
+          Vue3QuasarNodeApp
         </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
     <q-drawer
-      v-model="leftDrawerOpen"
       show-if-above
+      v-model="leftDrawerOpen"
+      side="left"
       bordered
+      class="q-pa-md"
     >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
+      <div class="user-info">
+        <q-avatar size="40px" class="user-info__avatar">
+          <img src="https://picsum.photos/seed/user/300/300" alt="" />
+        </q-avatar>
+        <div class="user-info__text">
+          <div class="user-info__name">User name</div>
+          <div class="user-info__meta">user@example.com</div>
+        </div>
+      </div>
 
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+      <nav class="drawer-nav" aria-label="Navegação principal">
+        <RouterLink class="drawer-nav__link" to="/"> Feed </RouterLink>
+        <q-separator />
+        <RouterLink class="drawer-nav__link" to="/stats"> Stats </RouterLink>
+      </nav>
     </q-drawer>
 
-    <q-page-container>
-      <router-view />
+    <q-page-container class="layout-page-container">
+      <q-page class="layout-main-page" :padding="false">
+        <router-view />
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+import { ref } from "vue";
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-]
+const leftDrawerOpen = ref(false);
 
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value;
 }
 </script>
+
+
+<style scoped>
+/* Shadcn-style sidebar user: muted rounded rectangle */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--user-info-border);
+  background: var(--user-info-bg);
+}
+
+.user-info__avatar {
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+.user-info__text {
+  min-width: 0;
+  flex: 1;
+}
+
+.user-info__name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--user-info-name);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-info__meta {
+  margin-top: 2px;
+  font-size: 0.9rem;
+  line-height: 1.25;
+  color: var(--user-info-meta);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.drawer-nav__link {
+  display: block;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  color: var(--foreground);
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.drawer-nav__link:hover {
+  background-color: var(--muted);
+}
+
+.drawer-nav__link.router-link-exact-active {
+  background-color: var(--muted);
+  font-weight: 600;
+}
+</style>

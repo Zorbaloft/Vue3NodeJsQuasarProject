@@ -6,6 +6,13 @@ const routes = [
       { path: '', component: () => import('pages/IndexPage.vue') }
     ]
   },
+  {
+    path: '/stats',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { name: 'stats', path: '', component: () => import('pages/StatsPage.vue') }
+    ]
+  },
 
   // Always leave this as last one,
   // but you can also remove it

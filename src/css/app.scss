@@ -1,1 +1,147 @@
-// app global css
+@import './theme';
+
+// ---------------------------------------------------------------------------
+// Global base styles
+// ---------------------------------------------------------------------------
+
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  font-family:
+    'Roboto',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  font-weight: 400;
+  color: var(--foreground);
+  background-color: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#q-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  height: 100%;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+// Vue Router leaves one child under #q-app; stretch so QLayout can fill the viewport
+#q-app > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+// MainLayout root: consume available height so the page container can scroll
+#q-app .q-layout {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+// Quasar page shell
+.q-page {
+  color: var(--foreground);
+}
+.layout-page-container {
+  padding: clamp(1.25rem, 4vw, 3rem);
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// After wrapping router-view in <q-page>, center this shell (was router root)
+.layout-page-container > .q-page {
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// ---------------------------------------------------------------------------
+// Headings & type rhythm (uses --font-size-xl / --font-size-lg / --font-size-base)
+// ---------------------------------------------------------------------------
+
+h1,
+.h1 {
+  margin: 0 0 0.5em;
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-tight);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+h2,
+.h2 {
+  margin: 0 0 0.5em;
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-tight);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--foreground);
+}
+
+h3,
+.h3,
+.lead {
+  margin: 0 0 0.5em;
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-tight);
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+p {
+  margin: 0 0 1em;
+  max-width: 65ch;
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+small,
+.small {
+  font-size: calc(var(--font-size-base) * 0.85);
+  color: var(--muted-foreground);
+}
+
+a {
+  color: var(--foreground);
+  text-decoration-color: var(--muted-foreground);
+  text-underline-offset: 3px;
+
+  &:hover {
+    text-decoration-color: var(--foreground);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Optional: drawer chrome when you want it to follow --sidebar tokens
+// (comment out if you prefer default Quasar drawer styling)
+// ---------------------------------------------------------------------------
+
+.q-drawer {
+  background-color: var(--sidebar);
+  color: var(--sidebar-foreground);
+  border-color: var(--sidebar-border) !important;
+}
