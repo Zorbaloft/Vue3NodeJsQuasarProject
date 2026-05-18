@@ -1,6 +1,5 @@
-# Vue3QuasarNodeApp (vue3quasarnodeproject)
+# Vue3QuasarNodeApp 
 
-A fast project for my interview
 ## Install the dependencies
 ```bash
 yarn
