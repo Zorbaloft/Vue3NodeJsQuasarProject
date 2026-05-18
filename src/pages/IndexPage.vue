@@ -8,14 +8,13 @@
       label="New Post"
       @click="showCreateModal = true"
     />
-    <ModalComponent v-model="showCreateModal" @add-post="publications.unshift($event)" />
+    <ModalComponent v-model="showCreateModal" />
   </div>
   <div class="feed">
    <PostComponent
       v-for="post in postsStore.posts"
       :key="post.id"
       :post="post"
-      @delete-post="deletePost($event)"
    />
   </div>
 </template>
@@ -27,18 +26,9 @@ import PostComponent from 'components/PostComponent.vue'
 import { ref } from 'vue'
 import { usePostsStore } from 'stores/storePosts'
 
-// Refs
 const showCreateModal = ref(false)
 
-// Stores
 const postsStore = usePostsStore()
-
-// Computed
-const deletePost = (id) => {
-  posts.value = posts.value.filter(
-    post => post.id !== id
-  )
-}
 </script>
 
 <style scoped>

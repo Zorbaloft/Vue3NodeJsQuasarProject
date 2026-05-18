@@ -81,13 +81,11 @@
 import { ref } from "vue";
 import { usePostsStore } from 'stores/storePosts'
 
-// Stores
 const postsStore = usePostsStore()
 
 const isOpen = defineModel({ type: Boolean, default: false });
 
 const text = ref("");
-const emit = defineEmits(['add-post'])
 
 const userName = ref("Alex");
 const userTag = ref("@alex");
@@ -96,15 +94,14 @@ const addPost = () => {
   postsStore.addPost({
     id: Date.now().toString(),
     content: text.value,
-    user:userName.value,
-    time:'2h',
-    usertag:userTag.value
+    user: userName.value,
+    time: '2h',
+    usertag: userTag.value
   })
 
   isOpen.value = false
   text.value = ''
 }
-
 </script>
 
 <style scoped>

@@ -13,6 +13,5 @@ import { createPinia } from 'pinia'
 export default defineStore((/* { ssrContext } */) => {
   const pinia = createPinia()
 
-
   return pinia
 })

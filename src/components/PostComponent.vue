@@ -48,10 +48,9 @@
 </template>
 
 <script setup>
-// Imports
 import { computed } from "vue";
 import { usePostsStore } from 'stores/storePosts'
-// Stores
+
 const postsStore = usePostsStore()
 
 const props = defineProps({
@@ -61,9 +60,7 @@ const props = defineProps({
   },
 });
 
-// Computed
 const characterLength = computed(() => {
   return props.post.content.length;
 });
-
 </script>
