@@ -1,6 +1,6 @@
 <template>
   <q-dialog
-    v-model="isOpen"
+    v-model="isModalOpen"
     transition-show="jump-up"
     transition-hide="jump-down"
   >
@@ -14,10 +14,10 @@
           </q-avatar>
           <div class="column q-mt-xs compose-modal__title-block">
             <div class="text-h6 text-weight-semibold compose-modal__title">
-              New Post
+              {{ isEditing ? 'Edit Post' : 'New Post' }}
             </div>
             <div class="text-caption compose-modal__subtitle">
-              {{ userName }} · {{ userTag }}
+              {{ modalSubtitle }}
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@
           v-close-popup
         />
         <q-btn
-          @click="addPost"
+          @click="savePost"
           unelevated
           rounded
           no-caps
@@ -78,28 +78,40 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { usePostsStore } from 'stores/storePosts'
 
 const postsStore = usePostsStore()
+const { isModalOpen, editingPost, isEditing } = storeToRefs(postsStore)
 
-const isOpen = defineModel({ type: Boolean, default: false });
+const text = ref('')
 
-const text = ref("");
+const modalSubtitle = computed(() => {
+  
+  if (editingPost.value) {
+    return `${editingPost.value.user} · ${editingPost.value.usertag}`
+  }
+  return `${postsStore.authStore.user.email} · ${postsStore.authStore.user.email.split('@')[0]}`
+})
 
-const userName = ref("Alex");
-const userTag = ref("@alex");
+watch(isModalOpen, (open) => {
+  if (open) {
+    text.value = editingPost.value?.content ?? ''
+  } else {
+    text.value = ''
+    postsStore.closeModal()
+  }
+})
 
-const addPost = () => {
-  postsStore.addPost({
-    id: Date.now().toString(),
-    content: text.value,
-    user: userName.value,
-    time: '2h',
-    usertag: userTag.value
-  })
+const savePost = async () => {
+  if (editingPost.value) {
+    await postsStore.editPost(editingPost.value.id, text.value)
+  } else {
+    await postsStore.addPost(text.value)
+  }
 
-  isOpen.value = false
+  postsStore.closeModal()
   text.value = ''
 }
 </script>

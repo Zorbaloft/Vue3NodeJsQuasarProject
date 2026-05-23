@@ -6,16 +6,20 @@
       color="primary"
       size="lg"
       label="New Post"
-      @click="showCreateModal = true"
+      @click="postsStore.openCreateModal()"
     />
-    <ModalComponent v-model="showCreateModal" />
+    <ModalComponent />
   </div>
-  <div class="feed">
+  <div class="feed" v-if="postsStore.posts.length > 0">
    <PostComponent
       v-for="post in postsStore.posts"
       :key="post.id"
       :post="post"
    />
+
+  </div>
+  <div class="feed" v-else>
+      <h2 class="text-center">No posts found</h2>
   </div>
 </template>
 
@@ -23,12 +27,23 @@
 
 import ModalComponent from 'components/ModalComponent.vue'
 import PostComponent from 'components/PostComponent.vue'
-import { ref } from 'vue'
 import { usePostsStore } from 'stores/storePosts'
-
-const showCreateModal = ref(false)
+import { useAuthStore } from 'stores/storeAuth'
+import { watch } from 'vue'
 
 const postsStore = usePostsStore()
+const authStore = useAuthStore()
+
+watch(
+  () => authStore.user?.id,
+  (userId) => {
+    if (userId) {
+      postsStore.getPosts()
+    }
+  },
+  { immediate: true }
+)
+
 </script>
 
 <style scoped>

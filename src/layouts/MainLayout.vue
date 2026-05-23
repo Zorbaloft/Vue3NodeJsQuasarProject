@@ -18,23 +18,36 @@
       v-model="leftDrawerOpen"
       side="left"
       bordered
-      class="q-pa-md"
+      class="main-drawer"
     >
-      <div class="user-info">
-        <q-avatar size="40px" class="user-info__avatar">
-          <img src="https://picsum.photos/seed/user/300/300" alt="" />
-        </q-avatar>
-        <div class="user-info__text">
-          <div class="user-info__name">User name</div>
-          <div class="user-info__meta">user@example.com</div>
-        </div>
-      </div>
+      <div class="drawer-inner column fit q-pa-md">
+        <div class="drawer-top">
+          <div class="user-info">
+            <q-avatar size="40px" class="user-info__avatar">
+              <img src="https://picsum.photos/seed/user/300/300" alt="" />
+            </q-avatar>
+            <div class="user-info__text">
+              <div class="user-info__name">{{ authStore.user.email }}</div>
+            </div>
+          </div>
 
-      <nav class="drawer-nav" aria-label="Navegação principal">
-        <RouterLink class="drawer-nav__link" to="/"> Feed </RouterLink>
-        <q-separator />
-        <RouterLink class="drawer-nav__link" to="/stats"> Stats </RouterLink>
-      </nav>
+          <nav class="drawer-nav" aria-label="Navegação principal">
+            <RouterLink class="drawer-nav__link" to="/"> Feed </RouterLink>
+            <q-separator />
+            <RouterLink class="drawer-nav__link" to="/stats"> Stats </RouterLink>
+          </nav>
+        </div>
+
+        <q-space />
+
+        <q-separator class="drawer-footer-sep" />
+        <q-btn
+          icon="logout"
+          label="Logout"
+          class="drawer-logout full-width"
+          @click="authStore.logoutUser()"
+        />
+      </div>
     </q-drawer>
 
     <q-page-container class="layout-page-container">
@@ -42,21 +55,53 @@
         <router-view />
       </q-page>
     </q-page-container>
+
+    <q-footer elevated class="bg-primary text-white"></q-footer>
   </q-layout>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue'
+import { useAuthStore } from 'stores/storeAuth'
 
-const leftDrawerOpen = ref(false);
+const authStore = useAuthStore()
+
+const leftDrawerOpen = ref(false)
 
 function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
+  leftDrawerOpen.value = !leftDrawerOpen.value
 }
 </script>
 
 
 <style scoped>
+.main-drawer :deep(.q-drawer__content) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.drawer-inner {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.drawer-top {
+  flex-shrink: 0;
+}
+
+.drawer-footer-sep {
+  background: var(--border);
+  margin-bottom: 8px;
+}
+
+.drawer-logout {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 4px;
+  color: var(--muted-foreground);
+}
+
 /* Shadcn-style sidebar user: muted rounded rectangle */
 .user-info {
   display: flex;
