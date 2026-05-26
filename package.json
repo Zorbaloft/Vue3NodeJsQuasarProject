@@ -11,7 +11,10 @@
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
     "build": "quasar build",
-    "postinstall": "quasar prepare"
+    "postinstall": "quasar prepare",
+    "firebase": "firebase",
+    "firebase:login": "firebase login",
+    "firebase:deploy:rules": "firebase deploy --only firestore:rules"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",
@@ -27,6 +30,7 @@
     "autoprefixer": "^10.4.27",
     "eslint": "^9.39.4",
     "eslint-plugin-vue": "^10.8.0",
+    "firebase-tools": "^15.18.0",
     "globals": "^17.4.0",
     "postcss": "^8.5.8",
     "vite-plugin-checker": "^0.12.0",

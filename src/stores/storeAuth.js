@@ -1,32 +1,41 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
 import { auth } from 'boot/firebase'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,onAuthStateChanged } from 'firebase/auth'
-import { useRouter } from 'vue-router'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: {},
     error: null,
     loading: false,
-    router: useRouter(), // this is composition api mixin, but its only to save time, dont do this! this is not a good practice.
+    UserAuthenticated : false,
+    FbResponse: false, // this way we can prevent more than 1 listener on our onAuthStateChanged everytime the user changes his route
   }),
   getters: {
     currentUser(state) {
       return state.user
+    },
+    isAuthenticated(state) {
+      return state.UserAuthenticated 
     }
   },
   actions: {
     initAuthListener() {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          this.user.id = user.uid
-          this.user.email = user.email
-          this.router.push('/')
-        } else {
-          this.user = {}
-          this.router.push('/login')
-        }
-      });
+      if(this.FbResponse) return
+      return new Promise((resolve) => {
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            this.UserAuthenticated = true
+            this.user.id = user.uid
+            this.user.email = user.email
+            this.FbResponse = true
+            resolve()
+          } else {
+            this.user = {}
+            this.FbResponse = true
+            resolve()
+          }
+        })
+      })
     },
     async registerUser(credentials) {
       const userCredential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password)
@@ -38,7 +47,8 @@ export const useAuthStore = defineStore('auth', {
     },
     async logoutUser() {
       await signOut(auth);
-    }
+    },
+
   }
 })
 

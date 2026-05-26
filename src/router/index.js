@@ -1,6 +1,7 @@
 import { defineRouter } from '#q-app/wrappers'
 import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
 import routes from './routes'
+import { useAuthStore } from 'src/stores/storeAuth';
 
 /*
  * If not building with SSR mode, you can
@@ -11,10 +12,12 @@ import routes from './routes'
  * with the Router instance.
  */
 
-export default defineRouter((/* { store, ssrContext } */) => {
+export default defineRouter(({ store }) => {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
+
+  const authStore = useAuthStore(store)
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -26,8 +29,21 @@ export default defineRouter((/* { store, ssrContext } */) => {
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
 
-  Router.beforeEach(async (to, from) => {
-    console.log('to' , to)
+  Router.beforeEach(async (to) => {
+    await authStore.initAuthListener()
+
+    if (
+      !authStore.isAuthenticated &&
+      to.name !== 'login'
+    ) {
+      return { name: 'login' }
+    }
+    if (
+      authStore.isAuthenticated &&
+      to.name == 'login'
+    ) {
+      return false
+    }
   })
 
   return Router
