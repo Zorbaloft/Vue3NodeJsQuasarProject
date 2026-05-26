@@ -81,7 +81,9 @@
 import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { usePostsStore } from 'stores/storePosts'
+import { useAuthStore } from 'stores/storeAuth'
 
+const authStore = useAuthStore()
 const postsStore = usePostsStore()
 const { isModalOpen, editingPost, isEditing } = storeToRefs(postsStore)
 
@@ -92,7 +94,7 @@ const modalSubtitle = computed(() => {
   if (editingPost.value) {
     return `${editingPost.value.user} · ${editingPost.value.usertag}`
   }
-  return `${postsStore.authStore.user.email} · ${postsStore.authStore.user.email.split('@')[0]}`
+  return `${authStore.user.email} · ${authStore.user.email.split('@')[0]}`
 })
 
 watch(isModalOpen, (open) => {

@@ -39,6 +39,8 @@ watch(
   (userId) => {
     if (userId) {
       postsStore.getPosts()
+    }else {
+      postsStore.clearPosts()
     }
   },
   { immediate: true }

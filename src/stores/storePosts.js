@@ -11,6 +11,8 @@ export const usePostsStore = defineStore('posts', () => {
   const isModalOpen = ref(false)
   const editingPostId = ref(null)
 
+  let unsubGetPosts = null
+
   const editingPost = computed(() => {
     if (editingPostId.value == null) return null
     return posts.value.find((post) => post.id == editingPostId.value) ?? null
@@ -36,14 +38,22 @@ export const usePostsStore = defineStore('posts', () => {
 
   async function getPosts() {
     if (!authStore.user?.id) return
+    if (unsubGetPosts) unsubGetPosts()
 
     const postsCollection = query(
       collection(db, 'users', authStore.user.id, 'posts'),
       limit(10)
     )
-    onSnapshot(postsCollection, (querySnapshot) => {
-      posts.value = querySnapshot.docs.map((d) => ({ id: d.id, ...d.data() }))
-    })
+    unsubGetPosts = onSnapshot(postsCollection, (querySnapshot) => {
+        posts.value = querySnapshot.docs.map((d) => ({ id: d.id, ...d.data() }))
+      })
+  }
+
+  async function clearPosts() {
+    if (unsubGetPosts === null) return
+    unsubGetPosts();
+    posts.value = [];
+
   }
 
   async function addPost(content) {
@@ -78,7 +88,7 @@ export const usePostsStore = defineStore('posts', () => {
     posts, isModalOpen, editingPostId,
     editingPost, isEditing, postsByUser,
     getPosts, addPost, deletePost, editPost,
-    openCreateModal, openEditModal, closeModal,
+    openCreateModal, openEditModal, closeModal, clearPosts
   }
 })
 
