@@ -1,30 +1,38 @@
 <template>
-  <div class="column items-end q-my-lg">
-    <q-btn
-      unelevated
-      rounded
-      color="primary"
-      size="lg"
-      label="New Post"
-      @click="postsStore.openCreateModal()"
-    />
-    <ModalComponent />
-  </div>
-  <div class="feed" v-if="postsStore.posts.length > 0">
-   <PostComponent
-      v-for="post in postsStore.posts"
-      :key="post.id"
-      :post="post"
-   />
+  <div class="main-page">
+    <section class="main-page__feed">
+      <div class="column items-end q-my-lg">
+        <q-btn
+          unelevated
+          rounded
+          color="primary"
+          size="lg"
+          label="New Post"
+          @click="postsStore.openCreateModal()"
+        />
+        <ModalComponent />
+      </div>
+      <div class="feed" v-if="postsStore.posts.length > 0">
+        <PostComponent
+          v-for="post in postsStore.posts"
+          :key="post.id"
+          :post="post"
+        />
+      </div>
+      <div class="feed" v-else>
+        <h2 class="text-center">No posts found</h2>
+      </div>
+    </section>
 
-  </div>
-  <div class="feed" v-else>
-      <h2 class="text-center">No posts found</h2>
+    <aside class="main-page__chat">
+      <ChatComponent />
+    </aside>
   </div>
 </template>
 
 <script setup>
 
+import ChatComponent from 'components/ChatComponent.vue'
 import ModalComponent from 'components/ModalComponent.vue'
 import PostComponent from 'components/PostComponent.vue'
 import { usePostsStore } from 'stores/storePosts'
@@ -49,6 +57,38 @@ watch(
 </script>
 
 <style scoped>
+.main-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: clamp(1rem, 3vw, 1.75rem);
+  align-items: start;
+  width: 100%;
+}
+
+.main-page__feed {
+  min-width: 0;
+}
+
+.main-page__chat {
+  position: sticky;
+  top: 0;
+  min-width: 0;
+  height: calc(100dvh - clamp(2.5rem, 8vw, 6rem));
+  max-height: calc(100dvh - clamp(2.5rem, 8vw, 6rem));
+}
+
+@media (max-width: 960px) {
+  .main-page {
+    grid-template-columns: 1fr;
+  }
+
+  .main-page__chat {
+    position: static;
+    height: min(520px, 70dvh);
+    max-height: min(520px, 70dvh);
+  }
+}
+
 .feed {
   width: 100%;
   display: flex;
