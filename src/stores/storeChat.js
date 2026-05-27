@@ -1,3 +1,5 @@
+// Inicialy made with 2 queries but after concideration we passed to 1 query since it was simpler an cheaper
+
 import { defineStore, acceptHMRUpdate } from "pinia";
 import { ref } from "vue";
 import { db } from "boot/firebase";
@@ -10,11 +12,15 @@ import {
   orderBy,
   onSnapshot,
   limit,
+  doc,
+  serverTimestamp,
+  setDoc,
+  addDoc,
 } from "firebase/firestore";
-import { useAuthStore } from 'stores/storeAuth'
+import { useAuthStore } from "stores/storeAuth";
 
 export const useChatStore = defineStore("chat", () => {
-  const authStore = useAuthStore()
+  const authStore = useAuthStore();
   const users = ref([]);
   const selectedUser = ref(null);
   const messages = ref([]);
@@ -25,8 +31,8 @@ export const useChatStore = defineStore("chat", () => {
     const usersQuery = query(
       collection(db, "users"),
       where(documentId(), "!=", authStore.user.id),
-      orderBy(documentId())
-    )
+      orderBy(documentId()),
+    );
 
     const usersSnapshot = await getDocs(usersQuery);
 
@@ -37,91 +43,72 @@ export const useChatStore = defineStore("chat", () => {
   }
 
   function selectUser(user) {
-    selectedUser.value = user
+    selectedUser.value = user;
   }
 
   function clearSelectedUser() {
-    selectedUser.value = null
-  }
-
-  function getMessageTime(message) {
-    const raw = message.Time ?? message.createdAt
-    if (raw?.toMillis) return raw.toMillis()
-    const parsed = Number(raw)
-    return Number.isNaN(parsed) ? 0 : parsed
-  }
-
-  function mergeConversationMessages(sent, received) {
-    messages.value = [...sent, ...received].sort(
-      (a, b) => getMessageTime(a) - getMessageTime(b)
-    )
+    selectedUser.value = null;
   }
 
   function openConversation(user) {
     if (!authStore.user?.id || !user?.id) return
-
+  
     closeConversation()
-
+  
     const me = authStore.user.id
     const other = user.id
-
-    const sentQuery = query(
-      collection(db, 'messages'),
-      where('from', '==', me),
-      where('to', '==', other),
+    const conversationId = [me, other].sort().join('_')
+  
+    const messagesQuery = query(
+      collection(db, 'conversations', conversationId, 'messages'),
+      orderBy('createdAt', 'asc'),
       limit(50)
     )
-
-    const receivedQuery = query(
-      collection(db, 'messages'),
-      where('from', '==', other),
-      where('to', '==', me),
-      limit(50)
-    )
-
-    let sentMessages = []
-    let receivedMessages = []
-
-    const unsubSent = onSnapshot(
-      sentQuery,
-      (querySnapshot) => {
-        sentMessages = querySnapshot.docs.map((doc) => ({
+  
+    unsubConversation = onSnapshot(
+      messagesQuery,
+      (snapshot) => {
+        messages.value = snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data(),
+          ...doc.data()
         }))
-        mergeConversationMessages(sentMessages, receivedMessages)
       },
       (error) => {
-        console.error('sentQuery error:', error)
+        console.error('openConversation error:', error)
       }
     )
-
-    const unsubReceived = onSnapshot(
-      receivedQuery,
-      (querySnapshot) => {
-        receivedMessages = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        mergeConversationMessages(sentMessages, receivedMessages)
-      },
-      (error) => {
-        console.error('receivedQuery error:', error)
-      }
-    )
-
-    unsubConversation = () => {
-      unsubSent()
-      unsubReceived()
-      messages.value = []
-    }
   }
 
   function closeConversation() {
     if (unsubConversation) {
       unsubConversation()
       unsubConversation = null
+      messages.value = []
     }
+  }
+
+  async function sendMessage(message) {
+    const trimmed = message.trim();
+    if (!trimmed || !authStore.user?.id || !selectedUser.value?.id) return;
+    const me = authStore.user.id;
+    const other = selectedUser.value.id;
+    const conversationId = [me, other].sort().join("_");
+
+    await setDoc(
+      doc(db, "conversations", conversationId),
+      {
+        participants: [me, other],
+        createdAt: serverTimestamp(),
+      },
+      { merge: true },
+    );
+
+    await addDoc(collection(db, "conversations", conversationId, "messages"), {
+      from: me,
+      content: trimmed,
+      to: other,
+      createdAt: serverTimestamp(),
+    });
   }
 
   return {
@@ -133,6 +120,7 @@ export const useChatStore = defineStore("chat", () => {
     clearSelectedUser,
     openConversation,
     closeConversation,
+    sendMessage
   };
 });
 

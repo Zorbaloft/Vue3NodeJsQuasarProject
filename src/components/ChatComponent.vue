@@ -90,14 +90,14 @@
 
       <footer class="chat-panel__composer">
         <q-input
+          v-model="message"
           dense
           outlined
-          readonly
           placeholder="Type a message..."
           class="chat-panel__input"
         >
           <template #append>
-            <q-btn flat round dense icon="send" color="primary" disable />
+            <q-btn flat round dense icon="send" color="primary" @click="sendMessage" />
           </template>
         </q-input>
       </footer>
@@ -106,7 +106,7 @@
 </template>
 
 <script setup>
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useChatStore } from 'stores/storeChat'
 import { useAuthStore } from 'stores/storeAuth'
@@ -114,6 +114,9 @@ import { useAuthStore } from 'stores/storeAuth'
 const chatStore = useChatStore()
 const authStore = useAuthStore()
 const { users, selectedUser, messages } = storeToRefs(chatStore)
+
+const message = ref('')
+
 
 onMounted(() => {
   chatStore.getUsers()
@@ -147,7 +150,7 @@ function isSentByMe(message) {
 }
 
 function getMessageText(message) {
-  return message.text ?? message.Content ?? ''
+  return message.text ?? message.content ?? ''
 }
 
 function formatMessageStamp(message) {
@@ -170,6 +173,13 @@ function selectUser(user) {
 function clearSelectedUser() {
   chatStore.clearSelectedUser()
 }
+
+const sendMessage = async () => {
+  await chatStore.sendMessage(message.value)
+  message.value = ''
+}
+
+
 </script>
 
 <style scoped>
