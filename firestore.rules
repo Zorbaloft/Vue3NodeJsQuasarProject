@@ -20,5 +20,16 @@ service cloud.firestore {
             && conversationId.matches('.*' + request.auth.uid + '.*');
         }
     }
+    match /notifications/{notificationId} {
+      allow get: if request.auth != null
+        && request.auth.uid == resource.data.to;
+
+      allow list: if request.auth != null;
+
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.to
+        && request.resource.data.to == resource.data.to
+        && request.resource.data.from == resource.data.from;
+    }
   }
 }

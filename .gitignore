@@ -31,3 +31,9 @@ yarn-error.log*
 
 # local .env files
 .env.local*
+
+# Firebase emulator local data
+emulator-data/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

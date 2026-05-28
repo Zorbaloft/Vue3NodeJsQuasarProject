@@ -10,6 +10,24 @@
           </q-avatar>
           Vue3QuasarNodeApp
         </q-toolbar-title>
+
+        <q-btn flat round dense icon="notifications" aria-label="Notifications">
+          <q-badge
+            v-if="unreadCount > 0"
+            color="red"
+            floating
+            rounded
+            :label="unreadCount > 99 ? '99+' : unreadCount"
+          />
+
+          <q-menu
+            v-model="notificationsMenuOpen"
+            anchor="bottom right"
+            self="top right"
+          >
+            <NotificationsComponent @notification-opened="notificationsMenuOpen = false" />
+          </q-menu>
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -64,13 +82,20 @@
 
 <script setup>
 import { ref, watch } from "vue";
+import { storeToRefs } from "pinia";
 import { useAuthStore } from "stores/storeAuth";
-import { useRouter } from "vue-router"; 
+import { useNotificationsStore } from "stores/storeNotifications";
+import { useRouter } from "vue-router";
+import NotificationsComponent from "components/NotificationsComponent.vue";
 
 const authStore = useAuthStore();
+const notificationsStore = useNotificationsStore();
 const router = useRouter();
 
+const { unreadCount } = storeToRefs(notificationsStore);
+
 const leftDrawerOpen = ref(false);
+const notificationsMenuOpen = ref(false);
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -79,6 +104,19 @@ function toggleLeftDrawer() {
 async function logout() {
   await authStore.logoutUser()
 }
+
+watch(
+  () => authStore.user?.id,
+  (userId) => {
+    if (userId) {
+      notificationsStore.listenNotifications();
+      return;
+    }
+
+    notificationsStore.clearNotifications();
+  },
+  { immediate: true },
+);
 
 watch(
   () => authStore.isAuthenticated,
