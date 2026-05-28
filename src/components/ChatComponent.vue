@@ -106,7 +106,7 @@
 </template>
 
 <script setup>
-import { onMounted, watch, ref } from 'vue'
+import { watch, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useChatStore } from 'stores/storeChat'
 import { useAuthStore } from 'stores/storeAuth'
@@ -117,10 +117,14 @@ const { users, selectedUser, messages } = storeToRefs(chatStore)
 
 const message = ref('')
 
-
-onMounted(() => {
-  chatStore.getUsers()
-})
+//cant be onMounted because we need to wait the userId
+watch(
+  () => authStore.user?.id,
+  (userId) => {
+    if (userId) chatStore.getUsers()
+  },
+  { immediate: true }
+)
 
 watch(selectedUser, (user, previousUser) => {
   if (user) {

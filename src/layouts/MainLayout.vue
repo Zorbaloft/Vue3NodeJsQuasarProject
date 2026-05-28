@@ -34,7 +34,9 @@
           <nav class="drawer-nav" aria-label="Navegação principal">
             <RouterLink class="drawer-nav__link" to="/"> Feed </RouterLink>
             <q-separator />
-            <RouterLink class="drawer-nav__link" to="/stats"> Stats </RouterLink>
+            <RouterLink class="drawer-nav__link" to="/stats">
+              Stats
+            </RouterLink>
           </nav>
         </div>
 
@@ -45,7 +47,7 @@
           icon="logout"
           label="Logout"
           class="drawer-logout full-width"
-          @click="authStore.logoutUser()"
+          @click="logout"
         />
       </div>
     </q-drawer>
@@ -61,18 +63,30 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useAuthStore } from 'stores/storeAuth'
+import { ref, watch } from "vue";
+import { useAuthStore } from "stores/storeAuth";
+import { useRouter } from "vue-router"; 
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
+const router = useRouter();
 
-const leftDrawerOpen = ref(false)
+const leftDrawerOpen = ref(false);
 
 function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
+  leftDrawerOpen.value = !leftDrawerOpen.value;
 }
-</script>
 
+async function logout() {
+  await authStore.logoutUser()
+}
+
+watch(
+  () => authStore.isAuthenticated,
+  (isAuth) => {
+    if (!isAuth) router.push({ name: 'login' })
+  }
+)
+</script>
 
 <style scoped>
 .main-drawer :deep(.q-drawer__content) {

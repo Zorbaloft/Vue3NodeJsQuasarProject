@@ -99,6 +99,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useAuthStore } from 'stores/storeAuth'
+import { useRouter } from "vue-router"; 
 
 const props = defineProps({
   mode: {
@@ -109,6 +110,7 @@ const props = defineProps({
 })
 
 const authStore = useAuthStore()
+const router = useRouter();
 
 const name = ref('')
 const email = ref('')
@@ -158,6 +160,7 @@ const onSubmit = async () => {
       await authStore.registerUser(credentials)
     } else {
       await authStore.loginUser(credentials)
+      router.push({ path: '/' })
     }
 
   } catch (error) {

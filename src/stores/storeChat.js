@@ -28,6 +28,9 @@ export const useChatStore = defineStore("chat", () => {
   let unsubConversation = null;
 
   async function getUsers() {
+    
+    if (!authStore.user?.id) return
+
     const usersQuery = query(
       collection(db, "users"),
       where(documentId(), "!=", authStore.user.id),

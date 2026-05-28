@@ -37,6 +37,8 @@ export const usePostsStore = defineStore('posts', () => {
   })
 
   async function getPosts() {
+    console.log('getPosts called, user id:', authStore.user?.id)
+
     if (!authStore.user?.id) return
     if (unsubGetPosts) unsubGetPosts()
 
